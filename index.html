@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rütbe Tahmin Oyunu</title>
+    <style>
+        body {
+            background-color: #d3d3d3;
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 20px;
+        }
+        .game-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        img {
+            max-width: 100%;
+            height: auto;
+        }
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <h1>Rütbe Tahmin Oyunu</h1>
+        <p id="instructions">Resimdeki rütbeyi tahmin edin:</p>
+        <img id="rankImage" src="" alt="Rütbe Resmi">
+        <div>
+            <input type="text" id="guessInput" placeholder="Rütbe tahmini" autocomplete="off">
+            <button onclick="submitGuess()">Tahmin Et</button>
+        </div>
+        <p id="feedback"></p>
+        <p id="score" class="hidden"></p>
+    </div>
+
+    <script>
+        const ranks = [
+            { name: "Er", image: "er.jpg" },
+            { name: "Onbaşı", image: "img/onbasi.png" },
+            { name: "Çavuş", image: "img/cavus.png" },
+            { name: "Uzman Çavuş", image: "img/uzmancavus.png" },
+            { name: "Astsubay cavus", image: "img/astsubaycavus.png" },
+            { name: "Astsubay astcavus", image: "img/astsubayastcavus.png" },
+            { name: "Teğmen", image: "img/tegmen.png" },
+
+
+        ];
+
+        let currentRank = {};
+        let correctGuesses = 0;
+        let attempts = 0;
+
+        function startGame() {
+            correctGuesses = 0;
+            attempts = 0;
+            document.getElementById("feedback").textContent = "";
+            document.getElementById("score").classList.add("hidden");
+            nextRank();
+        }
+
+        function nextRank() {
+            currentRank = ranks[Math.floor(Math.random() * ranks.length)];
+            document.getElementById("rankImage").src = currentRank.image;
+            document.getElementById("guessInput").value = "";
+        }
+
+        function submitGuess() {
+            const userGuess = document.getElementById("guessInput").value.trim();
+
+            if (userGuess.toLowerCase() === currentRank.name.toLowerCase()) {
+                correctGuesses++;
+                document.getElementById("feedback").textContent = "Doğru!";
+            } else {
+                document.getElementById("feedback").textContent = `Yanlış! Doğru cevap: ${currentRank.name}`;
+            }
+
+            attempts++;
+
+            if (correctGuesses === 3) {
+                document.getElementById("score").textContent = `Tebrikler! ${attempts} denemede 3 doğru yaptınız.`;
+                document.getElementById("score").classList.remove("hidden");
+            } else {
+                nextRank();
+            }
+        }
+
+        // Oyunu başlat
+        startGame();
+    </script>
+</body>
+</html>

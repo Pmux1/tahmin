@@ -71,12 +71,23 @@
         function nextRank() {
             currentRank = ranks[Math.floor(Math.random() * ranks.length)];
             const imageElement = document.getElementById("rankImage");
-            imageElement.src = currentRank.image + "?time=" + new Date().getTime();
+
+    // Resmi sıfırlama ve yeni bir URL ekleme
+            const newSrc = currentRank.image + "?time=" + new Date().getTime();
+    
+    // Eğer kaynak değişmediyse, tekrar yüklemeyi zorla
+            if (imageElement.src !== newSrc) {
+                imageElement.src = newSrc;
+            }
+
             document.getElementById("guessInput").value = "";
+
             imageElement.onload = function() {
-                // Resim yüklendiğinde yapılacak işlemler
+        // Resim yüklendiğinde yapılacak işlemler
                 console.log("Resim başarıyla yüklendi.");
             };
+        }
+
         }
 
         function submitGuess() {

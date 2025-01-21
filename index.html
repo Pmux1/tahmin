@@ -69,7 +69,8 @@
 
         function nextRank() {
             currentRank = ranks[Math.floor(Math.random() * ranks.length)];
-            document.getElementById("rankImage").src = currentRank.image;
+            const imageElement = document.getElementById("rankImage");
+            imageElement.src = currentRank.image + "?time=" + new Date().getTime();
             document.getElementById("guessInput").value = "";
         }
 

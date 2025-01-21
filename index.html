@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Rütbe Tahmin Oyunu</title>
-    
     <style>
         body {
             background-color: #d3d3d3;
@@ -52,14 +51,13 @@
             { name: "Astsubay astcavus", image: "img/astsubayastcavus.png" },
             { name: "Teğmen", image: "img/tegmen.png" },
             { name: "Uzman onbaşı", image: "img/uzmanonbası.png" }
-
-
         ];
 
         let currentRank = {};
         let correctGuesses = 0;
         let attempts = 0;
 
+        // Oyunu başlat
         function startGame() {
             correctGuesses = 0;
             attempts = 0;
@@ -68,27 +66,29 @@
             nextRank();
         }
 
+        // Yeni rütbe seç
         function nextRank() {
             currentRank = ranks[Math.floor(Math.random() * ranks.length)];
             const imageElement = document.getElementById("rankImage");
 
-    // Resmi sıfırlama ve yeni bir URL ekleme
+            // Resmin URL'sini değiştir
             const newSrc = currentRank.image + "?time=" + new Date().getTime();
-    
-    // Eğer kaynak değişmediyse, tekrar yüklemeyi zorla
+
+            // Resim kaynağını değiştirme
             if (imageElement.src !== newSrc) {
                 imageElement.src = newSrc;
             }
 
+            // Tahmin inputunu sıfırlama
             document.getElementById("guessInput").value = "";
 
+            // Resim yüklendikten sonra yapılacak işlemler
             imageElement.onload = function() {
-        // Resim yüklendiğinde yapılacak işlemler
                 console.log("Resim başarıyla yüklendi.");
             };
         }
 
-
+        // Tahmin submit fonksiyonu
         function submitGuess() {
             const userGuess = document.getElementById("guessInput").value.trim();
 
@@ -101,6 +101,7 @@
 
             attempts++;
 
+            // 3 doğru tahmin yapıldığında skor göster
             if (correctGuesses === 3) {
                 document.getElementById("score").textContent = `Tebrikler! ${attempts} denemede 3 doğru yaptınız.`;
                 document.getElementById("score").classList.remove("hidden");
@@ -109,7 +110,7 @@
             }
         }
 
-        // Oyunu başlat
+        // Başlangıçta oyunu başlat
         startGame();
     </script>
 </body>

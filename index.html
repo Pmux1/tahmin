@@ -74,10 +74,8 @@
             // Resmin URL'sini değiştir
             const newSrc = currentRank.image + "?time=" + new Date().getTime();
 
-            // Resim kaynağını değiştirme
-            if (imageElement.src !== newSrc) {
-                imageElement.src = newSrc;
-            }
+            // Resim kaynağını değiştirme (resim URL'sinin zamanla değişmesini sağlamak)
+            imageElement.src = newSrc;
 
             // Tahmin inputunu sıfırlama
             document.getElementById("guessInput").value = "";

@@ -47,11 +47,11 @@
             <input type="text" id="username" placeholder="Kullanıcı Adı" autocomplete="off">
             <button onclick="startGame()">Oyuna Başla</button>
         </div>
-        <p id="instructions">Resimdeki rütbeyi tahmin edin:</p>
-        <img id="rankImage" src="" alt="Rütbe Resmi">
-        <div>
-            <input type="text" id="guessInput" placeholder="Rütbe tahmini" autocomplete="off" disabled>
-            <button onclick="submitGuess()" disabled>Tahmin Et</button>
+        <p id="instructions" class="hidden">Resimdeki rütbeyi tahmin edin:</p>
+        <img id="rankImage" class="hidden" src="" alt="Rütbe Resmi">
+        <div id="guess-container" class="hidden">
+            <input type="text" id="guessInput" placeholder="Rütbe tahmini" autocomplete="off">
+            <button id="guessButton" onclick="submitGuess()" disabled>Tahmin Et</button>
         </div>
         <p id="feedback"></p>
         <p id="score" class="hidden"></p>
@@ -99,14 +99,21 @@
                 return;
             }
 
+            // Başlangıç ekranını gizle
+            document.getElementById("username-container").style.display = "none";
+            document.getElementById("instructions").classList.remove("hidden");
+            document.getElementById("rankImage").classList.remove("hidden");
+            document.getElementById("guess-container").classList.remove("hidden");
+
+            // Tahmin inputu ve butonunu aktif et
+            document.getElementById("guessInput").disabled = false;
+            document.getElementById("guessButton").disabled = false;
+
             correctGuesses = 0;
             attempts = 0;
             document.getElementById("feedback").textContent = "";
             document.getElementById("score").classList.add("hidden");
-            document.getElementById("username-container").style.display = "none";
-            document.getElementById("rankImage").style.display = "block";
-            document.getElementById("guessInput").disabled = false;
-            document.querySelector("button").disabled = false;
+
             nextRank();
         }
 

@@ -71,19 +71,27 @@
             currentRank = ranks[Math.floor(Math.random() * ranks.length)];
             const imageElement = document.getElementById("rankImage");
 
-            // Resmin URL'sini değiştir
-            const newSrc = currentRank.image + "?time=" + new Date().getTime();
+            // Resmin URL'sini değiştirme
+            const newSrc = currentRank.image + "?time=" + new Date().getTime(); // Her seferinde benzersiz bir URL
 
-            // Resim kaynağını değiştirme (resim URL'sinin zamanla değişmesini sağlamak)
+            // Kaynağı değiştiriyoruz
             imageElement.src = newSrc;
 
-            // Tahmin inputunu sıfırlama
-            document.getElementById("guessInput").value = "";
-
-            // Resim yüklendikten sonra yapılacak işlemler
+            // Resmin yeniden yüklenmesi için sıfırlama
             imageElement.onload = function() {
                 console.log("Resim başarıyla yüklendi.");
             };
+
+            // Eğer resim yüklenmediyse, yükleme işlemini zorla
+            imageElement.onerror = function() {
+                console.log("Resim yüklenmedi, yeniden deniyoruz...");
+                setTimeout(() => {
+                    imageElement.src = newSrc; // Resim kaynağını tekrar değiştiriyoruz
+                }, 100); // 100 ms bekleme süresi
+            };
+
+            // Tahmin inputunu sıfırlama
+            document.getElementById("guessInput").value = "";
         }
 
         // Tahmin submit fonksiyonu

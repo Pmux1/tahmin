@@ -26,51 +26,30 @@
         .hidden {
             display: none;
         }
-        .scoreboard {
+        #scoreboard {
             margin-top: 20px;
-            text-align: left;
-        }
-        .scoreboard table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        .scoreboard th, .scoreboard td {
-            padding: 10px;
-            border: 1px solid #ddd;
+            padding: 20px;
+            background-color: #f1f1f1;
+            border-radius: 5px;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
         }
     </style>
 </head>
 <body>
     <div class="game-container">
         <h1>Rütbe Tahmin Oyunu</h1>
-        <div id="username-container">
-            <input type="text" id="username" placeholder="Kullanıcı Adı" autocomplete="off">
-            <button onclick="startGame()">Oyuna Başla</button>
-        </div>
-        <p id="instructions" class="hidden">Resimdeki rütbeyi tahmin edin:</p>
-        <img id="rankImage" class="hidden" src="" alt="Rütbe Resmi">
-        <div id="guess-container" class="hidden">
+        <div id="username"></div> <!-- Kullanıcı adı burada gösterilecek -->
+        <p id="instructions">Resimdeki rütbeyi tahmin edin:</p>
+        <img id="rankImage" src="" alt="Rütbe Resmi">
+        <div>
             <input type="text" id="guessInput" placeholder="Rütbe tahmini" autocomplete="off">
-            <button id="guessButton" onclick="submitGuess()" disabled>Tahmin Et</button>
+            <button onclick="submitGuess()">Tahmin Et</button>
         </div>
         <p id="feedback"></p>
         <p id="score" class="hidden"></p>
     </div>
 
-    <div class="scoreboard hidden" id="scoreboard">
-        <h2>Skor Tablosu</h2>
-        <table>
-            <thead>
-                <tr>
-                    <th>Kullanıcı Adı</th>
-                    <th>Doğru Tahminler</th>
-                    <th>Toplam Denemeler</th>
-                    <th>Skor</th>
-                </tr>
-            </thead>
-            <tbody id="scoreTable"></tbody>
-        </table>
-    </div>
+    <div id="scoreboard"></div> <!-- Skor tablosu burada gösterilecek -->
 
     <script>
         const ranks = [
@@ -89,31 +68,34 @@
         let attempts = 0;
         let username = "";
 
-        const scoreboard = [];
+        // Skorları localStorage'tan al
+        function loadScores() {
+            const scores = JSON.parse(localStorage.getItem("scores")) || [];
+            return scores;
+        }
+
+        // Skorları localStorage'a kaydet
+        function saveScores(scores) {
+            localStorage.setItem("scores", JSON.stringify(scores));
+        }
+
+        // Kullanıcı adı al
+        function setUsername() {
+            username = prompt("Lütfen kullanıcı adınızı girin:");
+            if (username) {
+                document.getElementById("username").textContent = `Kullanıcı Adı: ${username}`;
+                startGame();
+            } else {
+                alert("Kullanıcı adı gereklidir!");
+            }
+        }
 
         // Oyunu başlat
         function startGame() {
-            username = document.getElementById("username").value.trim();
-            if (username === "") {
-                alert("Lütfen bir kullanıcı adı girin!");
-                return;
-            }
-
-            // Başlangıç ekranını gizle
-            document.getElementById("username-container").style.display = "none";
-            document.getElementById("instructions").classList.remove("hidden");
-            document.getElementById("rankImage").classList.remove("hidden");
-            document.getElementById("guess-container").classList.remove("hidden");
-
-            // Tahmin inputu ve butonunu aktif et
-            document.getElementById("guessInput").disabled = false;
-            document.getElementById("guessButton").disabled = false;
-
             correctGuesses = 0;
             attempts = 0;
             document.getElementById("feedback").textContent = "";
             document.getElementById("score").classList.add("hidden");
-
             nextRank();
         }
 
@@ -122,21 +104,26 @@
             currentRank = ranks[Math.floor(Math.random() * ranks.length)];
             const imageElement = document.getElementById("rankImage");
 
-            const newSrc = currentRank.image + "?time=" + new Date().getTime(); // Benzersiz URL
+            // Resmin URL'sini değiştirme
+            const newSrc = currentRank.image + "?time=" + new Date().getTime(); // Her seferinde benzersiz bir URL
 
+            // Kaynağı değiştiriyoruz
             imageElement.src = newSrc;
 
+            // Resmin yeniden yüklenmesi için sıfırlama
             imageElement.onload = function() {
                 console.log("Resim başarıyla yüklendi.");
             };
 
+            // Eğer resim yüklenmediyse, yükleme işlemini zorla
             imageElement.onerror = function() {
                 console.log("Resim yüklenmedi, yeniden deniyoruz...");
                 setTimeout(() => {
                     imageElement.src = newSrc; // Resim kaynağını tekrar değiştiriyoruz
-                }, 100);
+                }, 100); // 100 ms bekleme süresi
             };
 
+            // Tahmin inputunu sıfırlama
             document.getElementById("guessInput").value = "";
         }
 
@@ -159,35 +146,32 @@
                 document.getElementById("score").classList.remove("hidden");
 
                 // Skorları kaydet
-                scoreboard.push({
-                    username: username,
-                    correct: correctGuesses,
-                    attempts: attempts,
-                    score: Math.round((correctGuesses / attempts) * 100) // Yüzdelik skor
-                });
-
-                // Skor tablosunu güncelle
-                updateScoreboard();
-                document.getElementById("scoreboard").classList.remove("hidden");
+                const scores = loadScores();
+                scores.push({ username, correctGuesses, attempts });
+                saveScores(scores);
+                displayScores();
             } else {
                 nextRank();
             }
         }
 
-        // Skor tablosunu güncelle
-        function updateScoreboard() {
-            const scoreTable = document.getElementById("scoreTable");
-            scoreTable.innerHTML = ""; // Tabloyu temizle
-            scoreboard.forEach(player => {
-                const row = document.createElement("tr");
-                row.innerHTML = `
-                    <td>${player.username}</td>
-                    <td>${player.correct}</td>
-                    <td>${player.attempts}</td>
-                    <td>${player.score}%</td>
-                `;
-                scoreTable.appendChild(row);
+        // Skorları ekranda göster
+        function displayScores() {
+            const scores = loadScores();
+            let scoresHtml = "<h2>Skor Tablosu</h2>";
+            scores.forEach((score, index) => {
+                scoresHtml += `<p>${index + 1}. ${score.username}: ${score.correctGuesses} doğru, ${score.attempts} deneme</p>`;
             });
+            document.getElementById("scoreboard").innerHTML = scoresHtml;
+        }
+
+        // Sayfa yüklendiğinde skor tablosunu görüntüle
+        window.onload = function() {
+            // Skor tablosunu göster
+            displayScores();
+
+            // Kullanıcı adını al
+            setUsername();
         }
     </script>
 </body>
